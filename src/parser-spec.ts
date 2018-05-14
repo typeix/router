@@ -97,7 +97,7 @@ describe("Parser", () => {
     expect(pattern.createUrl(params)).toBe("/canbeone/ws/should#+do-it/good");
   });
 
-  it("Should test patterns on /<clientId:(\\w+)>/<url:([\\w-]+)>", () => {
+  test("Should test patterns on /<clientId:(\\w+)>/<url:([\\w-]+)>", () => {
     let pattern = new RouteParser("/<clientId:(\\w+)>/<url:([\\w-]+)>");
     expect(pattern.isValid("/category/1/page/1")).toBeFalsy();
     expect(pattern.isValid("/category/abc1/abc")).toBeFalsy();
@@ -110,7 +110,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /home", () => {
+  test("Should test patterns on /home", () => {
     let pattern = new RouteParser("/home");
     expect(pattern.isValid("/home")).toBeTruthy();
     let params = pattern.getParams("/home");
@@ -118,7 +118,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /home/test", () => {
+  test("Should test patterns on /home/test", () => {
     let pattern = new RouteParser("/home/test");
     expect(pattern.isValid("/home/test")).toBeTruthy();
     let params = pattern.getParams("/home/test");
@@ -126,7 +126,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /home/test/abc", () => {
+  test("Should test patterns on /home/test/abc", () => {
     let pattern = new RouteParser("/home/test/abc");
     expect(pattern.isValid("/home/test/abc")).toBeTruthy();
     let params = pattern.getParams("/home/test/abc");
@@ -134,7 +134,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /category/<category:(\\d+)>/page/<pagenumber:(\\d+)>", () => {
+  test("Should test patterns on /category/<category:(\\d+)>/page/<pagenumber:(\\d+)>", () => {
     let pattern = new RouteParser("/category/<category:(\\d+)>/page/<pagenumber:(\\d+)>");
     expect(pattern.isValid("/category/1/page/1")).toBeTruthy();
     expect(pattern.isValid("/category/abc1/abc")).toBeFalsy();
@@ -146,7 +146,7 @@ describe("Parser", () => {
     });
   });
 
-  it("Should test patterns on /<category:(.*)>/page/<pageNum:(.*)>", () => {
+  test("Should test patterns on /<category:(.*)>/page/<pageNum:(.*)>", () => {
     let pattern = new RouteParser("/<category:(.*)>/page/<pageNum:(.*)>");
     expect(pattern.isValid("/category/page/1")).toBeTruthy();
     expect(pattern.isValid("/category/page/1/abc")).toBeTruthy();
@@ -172,7 +172,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /home/<id:(\\d+)>", () => {
+  test("Should test patterns on /home/<id:(\\d+)>", () => {
     let pattern = new RouteParser("/home/<id:(\\d+)>");
     expect(pattern.isValid("")).toBeFalsy();
     expect(pattern.isValid("/home/123")).toBeTruthy();
@@ -187,7 +187,7 @@ describe("Parser", () => {
     });
   });
 
-  it("Should test patterns on /home/<name:(\\w+)>", () => {
+  test("Should test patterns on /home/<name:(\\w+)>", () => {
     let pattern = new RouteParser("/home/<name:(\\w+)>");
     expect(pattern.isValid("")).toBeFalsy();
     expect(pattern.isValid("/home/123")).toBeTruthy();
@@ -204,7 +204,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should test patterns on /", () => {
+  test("Should test patterns on /", () => {
     let pattern = new RouteParser("/");
     expect(pattern.isValid("/")).toBeTruthy();
     expect(pattern.isValid("")).toBeFalsy();
@@ -212,7 +212,7 @@ describe("Parser", () => {
     expect(() => new RouteParser("abc/")).toThrow("Url must start with \/");
   });
 
-  it("Should get correct parameters on /can<any>one/<name:\\w+>/should<now:\\W+>do-it/<see:(\\w+)>", () => {
+  test("Should get correct parameters on /can<any>one/<name:\\w+>/should<now:\\W+>do-it/<see:(\\w+)>", () => {
     let pattern = new RouteParser("/can<any>one/<name:\\w+>/should<now:\\W+>do-it/<see:(\\w+)>" +
       "-<nice:([a-zA-Z]+)>-now-<only:\\d+>-not/user/<id:\\d+>");
     let url = "/can1454zfhg=?`='(    ()=(one/igor/should#+do-it/whata-smile-now-2306-not/user/1412";
@@ -229,7 +229,7 @@ describe("Parser", () => {
     expect(pattern.createUrl(params)).toBe(url);
   });
 
-  it("Should test pattern for /assets/<file:(.*)>", () => {
+  test("Should test pattern for /assets/<file:(.*)>", () => {
     let pattern = new RouteParser("/assets/<file:(.*)>");
     let url = "/assets/css/main.css";
     expect(pattern.isValid(url)).toBeTruthy();
@@ -241,7 +241,7 @@ describe("Parser", () => {
     });
   });
 
-  it("Should test patterns on /<clientId:(\\w+)>/<url:([\\w-]+\\/[\\w-]+)>/page/<number:(\\d+)>", () => {
+  test("Should test patterns on /<clientId:(\\w+)>/<url:([\\w-]+\\/[\\w-]+)>/page/<number:(\\d+)>", () => {
     let pattern = new RouteParser("/<clientId:(\\w+)>/<url:([\\w-]+\\/[\\w-]+)>/page/<number:(\\d+)>");
     expect(pattern.isValid("/ab123sbr/this-is-test/abc-123/page/123123")).toBeTruthy();
     let params = pattern.getParams("/ab123sbr/this-is-test/abc-123/page/123123");
@@ -253,7 +253,7 @@ describe("Parser", () => {
   });
 
 
-  it("Should get correct parameters on /assets/<file:(.*)>", () => {
+  test("Should get correct parameters on /assets/<file:(.*)>", () => {
     let pattern = new RouteParser("/assets/<file:(.*)>");
     let url = "/assets/css/main.css";
     expect(pattern.isValid(url)).toBeTruthy();
@@ -263,7 +263,7 @@ describe("Parser", () => {
   });
 
 
-  it("benchmark", () => {
+  test("benchmark", () => {
     let pattern = new RouteParser("/<clientId:(\w+)>/<url:([\w-]+\/[\w-]+)>/page/<number:(\d+)>");
     let t1 = (new Date).getTime();
     for (let i = 0; i < 100000; i++) {
