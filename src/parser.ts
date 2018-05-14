@@ -73,7 +73,7 @@ export class RouteParser {
    * @param {Object} vars
    * @returns {string}
    */
-  public createUrl(vars: Object): string {
+  public createUrl(vars: Object): string | boolean {
     if (this.verifyVariableKeys(vars) && isString(this.reverseUrlPattern)) {
       let keys = Object.keys(vars);
       let url = this.reverseUrlPattern;
@@ -83,7 +83,7 @@ export class RouteParser {
       }
       return url;
     }
-    return undefined;
+    return false;
   }
 
   /**
