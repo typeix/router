@@ -1,0 +1,38 @@
+{
+  "name": "@typeix/router",
+  "version": "1.0.0",
+  "description": "missing router for nodejs",
+  "main": "build/index.js",
+  "scripts": {
+    "compile": "tsc",
+    "test": "npm run compile && jest -c jest-runner.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typeix/router.git"
+  },
+  "keywords": [
+    "typeix",
+    "router",
+    "typescript"
+  ],
+  "author": "igor.zg1987@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/typeix/router/issues"
+  },
+  "homepage": "https://github.com/typeix/router#readme",
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "@types/node": "^9.6.12",
+    "jest": "^22.4.3",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3",
+    "ts-jest": "^22.4.5"
+  },
+  "dependencies": {
+    "@typeix/di": "1.0.1",
+    "@typeix/utils": "0.0.2",
+    "reflect-metadata": "^0.1.12"
+  }
+}
