@@ -1,5 +1,5 @@
 import {IParserConfig} from "./interfaces/iparser";
-import {isObject, isString, isUndefined} from "@typeix/utils";
+import {isArray, isDefined, isFalsy, isObject, isString, isUndefined} from "@typeix/utils";
 
 const PATTERN_MATCH = /<((\w+):)?([^>]+)>/g;
 const HAS_GROUP_START = /^\(/;
@@ -9,9 +9,11 @@ const HAS_GROUP_END = /\)$/;
  * Route parser
  */
 export class RouteParser {
-  urlMatchPattern: RegExp;
-  reverseUrlPattern: string;
-  variables: Map<string, RegExp> = new Map();
+
+  private reverseUrlPattern: string;
+  private variableSize = 0;
+  private urlMatchPattern: RegExp;
+  private variables: Map<string, { pattern: RegExp, index: number }> = new Map();
 
   /**
    * I parser config
@@ -20,7 +22,10 @@ export class RouteParser {
    */
   constructor(path: string, config?: IParserConfig) {
     let pattern, anyPattern = "([\\s\\S]+)";
-    if (PATTERN_MATCH.test(path)) {
+    if (isFalsy(path) || ["/", "*"].indexOf(path.charAt(0)) === -1) {
+      throw new Error("Url must start with \/ or it has to be * which match all patterns");
+    } else if (PATTERN_MATCH.test(path)) {
+      let vIndex = 0;
       pattern = path.replace(PATTERN_MATCH, (replace, key, source, index) => {
         let rPattern = index;
         if (isUndefined(key)) {
@@ -30,10 +35,15 @@ export class RouteParser {
         }
         this.variables.set(
           isUndefined(key) ? index : key.slice(0, -1),
-          new RegExp((isUndefined(key) ? anyPattern : index))
+          {
+            pattern: new RegExp((isUndefined(key) ? anyPattern : index)),
+            index: vIndex
+          }
         );
+        vIndex++;
         return rPattern;
       });
+      this.variableSize = vIndex + 1;
       this.reverseUrlPattern = path.replace(PATTERN_MATCH, (replace, key, source, index) => {
         return "<" + (isUndefined(source) ? index : source) + ">";
       });
@@ -54,7 +64,7 @@ export class RouteParser {
     let vKeys = Array.from(this.variables.keys());
     let oKeys = Object.keys(vars);
     return isObject(vars) && vKeys.every(key =>
-      oKeys.indexOf(key) > -1 && this.variables.get(key).test(vars[key])
+      oKeys.indexOf(key) > -1 && this.variables.get(key).pattern.test(vars[key])
     );
   }
 
@@ -74,6 +84,23 @@ export class RouteParser {
       return url;
     }
     return undefined;
+  }
+
+  /**
+   * Get parameters
+   * @param {string} path
+   * @returns {Object}
+   */
+  public getParams(path: string): Object {
+    let data = {};
+    let matches = this.urlMatchPattern.exec(path);
+    if (isDefined(matches) && isArray(matches)) {
+      let sMatches = matches.slice(1, this.variableSize + 1);
+      this.variables.forEach((value, key) => {
+        data[key] = sMatches[value.index];
+      });
+    }
+    return data;
   }
 
   /**
