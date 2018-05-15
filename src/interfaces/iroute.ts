@@ -1,3 +1,4 @@
+import {RestMethods} from "../headers";
 /**
  * @since 1.0.0
  * @interface
@@ -6,13 +7,12 @@
  * @description
  * If we match route we resolve it with this interface
  */
-import {Methods} from "../router";
 
 /**
  * Resolved route
  */
 export interface IResolvedRoute {
-  method: Methods;
+  method: RestMethods;
   params: Object;
   route: string;
 }
@@ -36,8 +36,6 @@ export interface IUrlTreePath {
  * @interface
  * @name Headers
  *
- * @description
- * ControllerResolver headers
  */
 export interface Headers {}
 /**
@@ -74,6 +72,6 @@ export declare type TRoute = {
 export interface RouteRuleConfig {
   url: string;
   route: string;
-  methods: Array<Methods>;
+  methods: Array<RestMethods>;
 }
 

@@ -1,7 +1,8 @@
 import {IAfterConstruct, Inject, Injectable} from "@typeix/di";
 import {RouteParser} from "./parser";
-import {IResolvedRoute, Route, RouteRuleConfig} from "./interfaces/iroute";
-import {getMethod} from "./router";
+import {IResolvedRoute, Route, RouteRuleConfig, Headers} from "./interfaces/iroute";
+import {toRestMethod} from "./headers";
+
 
 /**
  * @since 1.0.0
@@ -48,11 +49,11 @@ export class RouteRule implements Route, IAfterConstruct {
    * Parse request is used internally by Router to be able to parse request
    */
   parseRequest(path: string, method: string, headers: Headers): Promise<IResolvedRoute|boolean> {
-    if (!this.routeParser.isValid(path) || this.config.methods.indexOf(getMethod(method)) === -1) {
+    if (!this.routeParser.isValid(path) || this.config.methods.indexOf(toRestMethod(method)) === -1) {
       return Promise.resolve(false);
     }
     return Promise.resolve({
-      method: getMethod(method),
+      method: toRestMethod(method),
       params: this.routeParser.getParams(path),
       route: this.config.route
     });
