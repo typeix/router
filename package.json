@@ -31,8 +31,8 @@
     "ts-jest": "^22.4.5"
   },
   "dependencies": {
-    "@typeix/di": "1.3.0",
-    "@typeix/utils": "^1.4.1",
+    "@typeix/di": "~1.4.1",
+    "@typeix/utils": "~1.4.1",
     "reflect-metadata": "^0.1.12"
   }
 }
