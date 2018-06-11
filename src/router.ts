@@ -1,7 +1,8 @@
-import {isDefined, isEqual, isString, isTruthy} from "@typeix/utils";
+import {isDefined, isEqual, isString, isTruthy, Logger, ServerError} from "@typeix/utils";
 import {Inject, Injectable, Injector} from "@typeix/di";
 import {IResolvedRoute, Route, RouteRuleConfig, TRoute} from "./interfaces/iroute";
 import {RouteRule} from "./route-rule";
+import {StatusCodes} from "@typeix/utils";
 
 /**
  * @since 1.0.0
@@ -31,8 +32,8 @@ export class Router {
   /**
    * @param {Injector} injector
    */
-  //@Inject(Logger)
-  //private injector: Logger;
+  @Inject(Logger)
+  private logger: Logger;
   /**
    * @param {Injector} injector
    */
@@ -108,7 +109,11 @@ export class Router {
     if (this.errorRoutes.indexOf(route) === -1 && isString(route)) {
       let list = route.split("/");
       if (list.length < 2) {
-        throw new Error(`Invalid route structure: "${route}"! Valid are controller/action or module/controller/action!`);
+        throw new ServerError(
+          StatusCodes.Internal_Server_Error,
+          `Invalid route structure: "${route}"! Valid are controller/action or module/controller/action!`,
+          route
+        );
       }
       this.errorRoutes.push(route);
     }
@@ -125,7 +130,7 @@ export class Router {
    * All routes must be inherited from Route interface.
    */
   addRules(rules: Array<RouteRuleConfig>): void {
-    //this.logger.info("Router.addRules", rules);
+    this.logger.info("Router.addRules", rules);
     rules.forEach(config => this.routes.push(this.createRule(RouteRule, config)));
   }
 
@@ -140,8 +145,66 @@ export class Router {
    * Create rule and add rule to list
    */
   addRule(Class: TRoute, config?: RouteRuleConfig): void {
-    //this.logger.info("Router.addRule", Class);
+    this.logger.info("Router.addRule", Class);
     this.routes.push(this.createRule(Class, config));
+  }
+
+
+  /**
+   * @since 1.0.0
+   * @function
+   * @name Router#parseRequest
+   * @param {String} pathName
+   * @param {String} method
+   * @param {Headers} headers
+   *
+   * @description
+   * Parse request based on pathName and method
+   */
+  async parseRequest(pathName: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute> {
+    for (let route of this.routes) {
+      let result = await route.parseRequest(pathName, method, headers);
+      if (isTruthy(result) && !isEqual(true, result)) {
+        this.logger.info("Router.parseRequest", result);
+        return Promise.resolve(<IResolvedRoute> result);
+      }
+    }
+    throw new ServerError(
+      StatusCodes.Not_Found,
+      `Router.parseRequest: ${pathName} no route found, method: ${method}`,
+      {
+        pathName,
+        method
+      }
+    );
+  }
+
+  /**
+   * @since 1.0.0
+   * @function
+   * @name Router#createUrl
+   * @param {String} routeName
+   * @param {Object} params
+   *
+   * @description
+   * Create url based on route and params
+   */
+  async createUrl(routeName: string, params: Object): Promise<string> {
+    for (let route of this.routes) {
+      let result = await <Promise<string>> route.createUrl(routeName, params);
+      if (isTruthy(result) && !isEqual(true, result)) {
+        this.logger.info("Router.createUrl", result);
+        return Promise.resolve(Router.prefixSlash(result));
+      }
+    }
+    if (Object.keys(params).length > 0) {
+      routeName += "?";
+      Object.keys(params).forEach((k) => {
+        routeName += k + "=" + encodeURIComponent(params[k]);
+      });
+    }
+    this.logger.info("Router.createUrl", Router.prefixSlash(routeName));
+    return Promise.resolve(Router.prefixSlash(routeName));
   }
 
   /**
@@ -161,59 +224,6 @@ export class Router {
       isDefined(config) ? [{provide: "config", useValue: config}] : []
     );
     return injector.get(Class);
-  }
-
-  /**
-   * @since 1.0.0
-   * @function
-   * @name Router#parseRequest
-   * @param {String} pathName
-   * @param {String} method
-   * @param {Headers} headers
-   *
-   * @description
-   * Parse request based on pathName and method
-   */
-  async parseRequest(pathName: string, method: string, headers: Headers): Promise<IResolvedRoute> {
-    for (let route of this.routes) {
-      let result = await route.parseRequest(pathName, method, headers);
-      if (isTruthy(result) && !isEqual(true, result)) {
-        // this.logger.info("Router.parseRequest", result);
-        return Promise.resolve(<IResolvedRoute> result);
-      }
-    }
-    // throw new HttpError(Status.Not_Found, `Router.parseRequest: ${pathName} no route found, method: ${method}`, {
-    //   pathName,
-    //   method
-    // });
-  }
-
-  /**
-   * @since 1.0.0
-   * @function
-   * @name Router#createUrl
-   * @param {String} routeName
-   * @param {Object} params
-   *
-   * @description
-   * Create url based on route and params
-   */
-  async createUrl(routeName: string, params: Object): Promise<string> {
-    for (let route of this.routes) {
-      let result = await <Promise<string>> route.createUrl(routeName, params);
-      if (isTruthy(result) && !isEqual(true, result)) {
-        // this.logger.info("Router.createUrl", result);
-        return Promise.resolve(Router.prefixSlash(result));
-      }
-    }
-    if (Object.keys(params).length > 0) {
-      routeName += "?";
-      Object.keys(params).forEach((k) => {
-        routeName += k + "=" + encodeURIComponent(params[k]);
-      });
-    }
-    // this.logger.info("Router.createUrl", Router.prefixSlash(routeName));
-    return Promise.resolve(Router.prefixSlash(routeName));
   }
 
 }

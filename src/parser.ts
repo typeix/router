@@ -1,5 +1,5 @@
 import {IParserConfig} from "./interfaces/iparser";
-import {isArray, isDefined, isFalsy, isObject, isString, isUndefined} from "@typeix/utils";
+import {isArray, isDefined, isFalsy, isObject, isString, isUndefined, ServerError, StatusCodes} from "@typeix/utils";
 
 const PATTERN_MATCH = /<((\w+):)?([^>]+)>/g;
 const HAS_GROUP_START = /^\(/;
@@ -23,7 +23,14 @@ export class RouteParser {
   constructor(path: string, config?: IParserConfig) {
     let pattern, anyPattern = "([\\s\\S]+)";
     if (isFalsy(path) || ["/", "*"].indexOf(path.charAt(0)) === -1) {
-      throw new Error("Url must start with \/ or it has to be * which match all patterns");
+      throw new ServerError(
+        StatusCodes.Internal_Server_Error,
+        "Url must start with \/ or it has to be * which match all patterns",
+        {
+          path,
+          config
+        }
+      );
     } else if (PATTERN_MATCH.test(path)) {
       let vIndex = 0;
       pattern = path.replace(PATTERN_MATCH, (replace, key, source, index) => {
@@ -53,19 +60,6 @@ export class RouteParser {
       pattern = path;
     }
     this.urlMatchPattern = new RegExp("^" + pattern + "$");
-  }
-
-  /**
-   * Verify variable keys
-   * @param {Object} vars
-   * @returns {boolean}
-   */
-  private verifyVariableKeys(vars: Object): boolean {
-    let vKeys = Array.from(this.variables.keys());
-    let oKeys = Object.keys(vars);
-    return isObject(vars) && vKeys.every(key =>
-      oKeys.indexOf(key) > -1 && this.variables.get(key).pattern.test(vars[key])
-    );
   }
 
   /**
@@ -110,6 +104,20 @@ export class RouteParser {
    */
   public isValid(path: string): boolean {
     return this.urlMatchPattern.test(path);
+  }
+
+
+  /**
+   * Verify variable keys
+   * @param {Object} vars
+   * @returns {boolean}
+   */
+  private verifyVariableKeys(vars: Object): boolean {
+    let vKeys = Array.from(this.variables.keys());
+    let oKeys = Object.keys(vars);
+    return isObject(vars) && vKeys.every(key =>
+      oKeys.indexOf(key) > -1 && this.variables.get(key).pattern.test(vars[key])
+    );
   }
 
 }
