@@ -1,3 +1,6 @@
+/**
+ * @Todo implement parser options propagation
+ */
 export interface IParserConfig {
-  escape: boolean;
+  autoEscapeBackslash: boolean;
 }

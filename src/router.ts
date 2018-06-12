@@ -12,18 +12,6 @@ import {StatusCodes} from "@typeix/utils";
  * @description
  * Router is a component for handling routing in system.
  * All routes should be added during bootstrap process
- * @example
- * import { Bootstrap, Router } from "../core";
- * import { Assets } from "./components/assets";
- *
- * \@Bootstrap({
- *    port: 9000
- * })
- * export class Application {
- *   constructor(assets: Assets, router: Router) {
- *       router.add()
- *   }
- * }
  */
 
 @Injectable()
@@ -61,6 +49,9 @@ export class Router {
    * Prefixes url with starting slash
    */
   static prefixSlash(value: string): string {
+    if (value === "*") {
+      return "/";
+    }
     return value.charAt(0) === "/" ? value : "/" + value;
   }
 

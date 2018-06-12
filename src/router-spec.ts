@@ -113,6 +113,92 @@ describe("Router", () => {
   });
 
 
+
+  test("Testing handlers", () => {
+
+
+    let rootInjector = new Injector();
+    let injector = Injector.createAndResolve(Router, [
+      {provide: Injector, useValue: rootInjector},
+      Logger
+    ]);
+    let router1 = injector.get(Router);
+// adding rules
+
+    router1.addRules([
+      {
+        methods: [RestMethods.OPTIONS],
+        route: "handler1",
+        url: "*"
+      },
+      {
+        methods: [RestMethods.GET, RestMethods.POST],
+        route: "handler2",
+        url: "/"
+      },
+      {
+        methods: [RestMethods.GET, RestMethods.POST],
+        route: "handler3",
+        url: "/home"
+      },
+      {
+        methods: [RestMethods.GET],
+        route: "handler4",
+        url: "/home/<id:(\\d+)>"
+      }
+    ]);
+
+
+    return Promise.all([
+      router1.parseRequest("/", "POST", {}),
+      router1.parseRequest("/", "GET", {}),
+      router1.parseRequest("/authenticate", "OPTIONS", {}),
+      router1.parseRequest("/home", "GET", {}),
+      router1.parseRequest("/home/123", "GET", {}),
+      router1.createUrl("handler4", {id: 123}),
+      router1.createUrl("handler3", {}),
+      router1.createUrl("handler2", {}),
+      router1.createUrl("handler1", {})
+    ]).then((data) => {
+      let result = [
+        {
+          method: RestMethods.POST,
+          params: {},
+          route: "handler2"
+        },
+        {
+          method: RestMethods.GET,
+          params: {},
+          route: "handler2"
+        },
+        {
+          method: RestMethods.OPTIONS,
+          params: {},
+          route: "handler1"
+        },
+        {
+          method: RestMethods.GET,
+          params: {},
+          route: "handler3"
+        },
+        {
+          method: RestMethods.GET,
+          params: {
+            id: "123"
+          },
+          route: "handler4"
+        },
+        "/home/123",
+        "/home",
+        "/",
+        "/"
+      ];
+
+      expect(data).toEqual(result);
+    });
+
+  });
+
   test("Should invoke getError|hasError|setError", () => {
     let route = "core/error";
     router.setError(route);
