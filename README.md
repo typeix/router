@@ -2,11 +2,14 @@
 
 Missing router for node js
 
+##Required
+- Node.js gte 6.x
+- Typescript gte 2.x
+
 Installing:
 ```bash
-npm i @typeix/di --save
-npm i @typeix/router --save
-npm i @typeix/utils --save
+npm i @typeix/di @typeix/router @typeix/utils --save
+npm i @types/node --save-dev
 ```
 
 Example of usage:
@@ -58,35 +61,29 @@ router.addRules([
  */
 const handlers = {
   handler1: function (route: IResolvedRoute, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("handler 1: " + JSON.stringify(route));
-    response.end();
-  },
-  handler2: function (route: IResolvedRoute, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("handler 2: " + JSON.stringify(route));
-    response.end();
-  },
-  handler3: function (route: IResolvedRoute, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("handler 3: " + JSON.stringify(route));
-    response.end();
-  },
-  handler4: function (route: IResolvedRoute, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("handler 4: " + JSON.stringify(route));
-    response.end();
-  },
-  favicon: function (route: IResolvedRoute, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("X");
-    response.end();
-  },
-  error: function (error: ServerError, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("error: " + JSON.stringify(error));
-    response.end();
-  }
+      response.writeHead(200, {});
+      response.end("handler 1: " + JSON.stringify(route));
+    },
+    handler2: function (route: IResolvedRoute, response: ServerResponse) {
+      response.writeHead(200, {});
+      response.end("handler 2: " + JSON.stringify(route));
+    },
+    handler3: function (route: IResolvedRoute, response: ServerResponse) {
+      response.writeHead(200, {});
+      response.end("handler 3: " + JSON.stringify(route));
+    },
+    handler4: function (route: IResolvedRoute, response: ServerResponse) {
+      response.writeHead(200, {});
+      response.end("handler 4: " + JSON.stringify(route));
+    },
+    favicon: function (route: IResolvedRoute, response: ServerResponse) {
+      response.writeHead(200, {});
+      response.end("X");
+    },
+    error: function (error: ServerError, response: ServerResponse) {
+      response.writeHead(error.getCode(), {});
+      response.end("error: " + JSON.stringify(error));
+    }
 };
 
 

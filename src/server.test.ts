@@ -46,33 +46,27 @@ router.addRules([
 const handlers = {
   handler1: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.write("handler 1: " + JSON.stringify(route));
-    response.end();
+    response.end("handler 1: " + JSON.stringify(route));
   },
   handler2: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.write("handler 2: " + JSON.stringify(route));
-    response.end();
+    response.end("handler 2: " + JSON.stringify(route));
   },
   handler3: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.write("handler 3: " + JSON.stringify(route));
-    response.end();
+    response.end("handler 3: " + JSON.stringify(route));
   },
   handler4: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.write("handler 4: " + JSON.stringify(route));
-    response.end();
+    response.end("handler 4: " + JSON.stringify(route));
   },
   favicon: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.write("X");
-    response.end();
+    response.end("X");
   },
   error: function (error: ServerError, response: ServerResponse) {
-    response.writeHead(200, {});
-    response.write("error: " + JSON.stringify(error));
-    response.end();
+    response.writeHead(error.getCode(), {});
+    response.end("error: " + JSON.stringify(error));
   }
 };
 
