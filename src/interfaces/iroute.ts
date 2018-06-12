@@ -1,4 +1,5 @@
 import {RestMethods} from "../headers";
+
 /**
  * @since 1.0.0
  * @interface
@@ -16,28 +17,7 @@ export interface IResolvedRoute {
   params: Object;
   route: string;
 }
-/**
- * @since 1.0.0
- * @interface
- * @name IUrlTreePath
- *
- * @param {IUrlTreePath} child
- * @param {string} path
- *
- * @description
- * Metadata for RouteParser
- */
-export interface IUrlTreePath {
-  child?: IUrlTreePath;
-  path: string;
-}
-/**
- * @since 1.0.0
- * @interface
- * @name Headers
- *
- */
-export interface Headers {}
+
 /**
  * @since 1.0.0
  * @interface
@@ -47,9 +27,11 @@ export interface Headers {}
  * Route definition
  */
 export interface Route {
-  parseRequest(pathName: string, method: string, headers: Headers): Promise<IResolvedRoute|boolean>;
-  createUrl(routeName: string, params: Object): Promise<string|boolean>;
+  parseRequest(pathName: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute | boolean>;
+
+  createUrl(routeName: string, params: Object): Promise<string | boolean>;
 }
+
 /**
  * @since 1.0.0
  * @type
@@ -59,8 +41,9 @@ export interface Route {
  * TRoute declaration for type constructor
  */
 export declare type TRoute = {
-  new (): Route;
+  new(): Route;
 };
+
 /**
  * @since 1.0.0
  * @interface
