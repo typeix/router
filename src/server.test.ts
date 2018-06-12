@@ -1,7 +1,7 @@
 import {Injector} from "@typeix/di";
 import {Logger, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
-import {RestMethods, Router, IResolvedRoute} from "./index";
+import {RestMethods, Router, IResolvedRoute, fromRestMethod} from "./index";
 
 // Injector
 let rootInjector = new Injector();
@@ -41,24 +41,33 @@ router.addRules([
 ]);
 
 /**
+ * Nice route print
+ * @param {IResolvedRoute} route
+ * @returns {string}
+ */
+function routeToString(route: IResolvedRoute) {
+  return JSON.stringify(Object.assign(route, {method: fromRestMethod(route.method)}));
+}
+/**
  * Route handlers can be any function / object
  */
 const handlers = {
   handler1: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.end("handler 1: " + JSON.stringify(route));
+
+    response.end("handler 1: " + routeToString(route));
   },
   handler2: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.end("handler 2: " + JSON.stringify(route));
+    response.end("handler 2: " + routeToString(route));
   },
   handler3: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.end("handler 3: " + JSON.stringify(route));
+    response.end("handler 3: " + routeToString(route));
   },
   handler4: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.end("handler 4: " + JSON.stringify(route));
+    response.end("handler 4: " + routeToString(route));
   },
   favicon: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});

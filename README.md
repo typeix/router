@@ -15,7 +15,7 @@ npm i @types/node --save-dev
 ## Example of usage:
 ```typescript
 import {Injector} from "@typeix/di";
-import {Router, RestMethods, IResolvedRoute} from "@typeix/router";
+import {Router, RestMethods, IResolvedRoute, fromRestMethod} from "@typeix/router";
 import {Logger, isObject, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
 
@@ -40,7 +40,7 @@ router.addRules([
     url: "/"
   },
   {
-    methods: [RestMethods.GET, RestMethods.POST],
+    methods: [RestMethods.GET],
     route: "favicon",
     url: "/favicon.ico"
   },
@@ -57,33 +57,41 @@ router.addRules([
 ]);
 
 /**
+ * Nice route print
+ * @param {IResolvedRoute} route
+ * @returns {string}
+ */
+function routeToString(route: IResolvedRoute) {
+  return JSON.stringify(Object.assign(route, {method: fromRestMethod(route.method)}));
+}
+/**
  * Route handlers can be any function / object
  */
 const handlers = {
   handler1: function (route: IResolvedRoute, response: ServerResponse) {
-      response.writeHead(200, {});
-      response.end("handler 1: " + JSON.stringify(route));
-    },
-    handler2: function (route: IResolvedRoute, response: ServerResponse) {
-      response.writeHead(200, {});
-      response.end("handler 2: " + JSON.stringify(route));
-    },
-    handler3: function (route: IResolvedRoute, response: ServerResponse) {
-      response.writeHead(200, {});
-      response.end("handler 3: " + JSON.stringify(route));
-    },
-    handler4: function (route: IResolvedRoute, response: ServerResponse) {
-      response.writeHead(200, {});
-      response.end("handler 4: " + JSON.stringify(route));
-    },
-    favicon: function (route: IResolvedRoute, response: ServerResponse) {
-      response.writeHead(200, {});
-      response.end("X");
-    },
-    error: function (error: ServerError, response: ServerResponse) {
-      response.writeHead(error.getCode(), {});
-      response.end("error: " + JSON.stringify(error));
-    }
+    response.writeHead(200, {});
+    response.end("handler 1: " + routeToString(route));
+  },
+  handler2: function (route: IResolvedRoute, response: ServerResponse) {
+    response.writeHead(200, {});
+    response.end("handler 2: " + routeToString(route));
+  },
+  handler3: function (route: IResolvedRoute, response: ServerResponse) {
+    response.writeHead(200, {});
+    response.end("handler 3: " + routeToString(route));
+  },
+  handler4: function (route: IResolvedRoute, response: ServerResponse) {
+    response.writeHead(200, {});
+    response.end("handler 4: " + routeToString(route));
+  },
+  favicon: function (route: IResolvedRoute, response: ServerResponse) {
+    response.writeHead(200, {});
+    response.end("favicon.ico");
+  },
+  error: function (error: ServerError, response: ServerResponse) {
+    response.writeHead(error.getCode(), {});
+    response.end("error: " + JSON.stringify(error));
+  }
 };
 
 
@@ -106,3 +114,12 @@ let server = createServer();
 server.on("request", requestHandler);
 server.listen(4000);
 ```
+
+### Running routes:
+- ```/```  outputs ```handler 2: {"method":"GET","params":{},"route":"handler2"}``` works with post as well
+- ```/home```  outputs ```handler 3: {"method":"GET","params":{},"route":"handler3"}``` works with post as well
+- ```/home/123```  outputs ```handler 4: {"method":"GET","params":{"id":"123"},"route":"handler4"}``` works with post as well
+- ```/home/444```  outputs ```handler 4: {"method":"GET","params":{"id":"444"},"route":"handler4"}``` works with post as well
+- ```/home/444d```  outputs ```error: {"code":404}``` invalid because it does not match  "/home/<id:(\\d+)>" regex
+- ```/unknown```  outputs ```error: {"code":404}``` not valid route
+- ```/favicon.ico```  outputs ```favicon.ico``` string
