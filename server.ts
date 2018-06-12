@@ -1,22 +1,9 @@
-# @typeix/router
-
-Missing router for node js
-
-Installing:
-```bash
-npm i @typeix/di --save
-npm i @typeix/router --save
-npm i @typeix/utils --save
-```
-
-Example of usage:
-```typescript
 import {Injector} from "@typeix/di";
-import {Router, RestMethods, IResolvedRoute, toRestMethod} from "@typeix/router";
-import {Logger, isObject, ServerError} from "@typeix/utils";
+import {Logger, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
+import {RestMethods, Router, IResolvedRoute} from "./src";
 
-// Root injector used for dynamic routing
+// Injector
 let rootInjector = new Injector();
 let injector = Injector.createAndResolve(Router, [
   {provide: Injector, useValue: rootInjector},
@@ -108,6 +95,3 @@ async function requestHandler(request: IncomingMessage, response: ServerResponse
 let server = createServer();
 server.on("request", requestHandler);
 server.listen(4000);
-
-
-```

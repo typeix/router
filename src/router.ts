@@ -1,4 +1,4 @@
-import {isDefined, isEqual, isString, isTruthy, Logger, ServerError} from "@typeix/utils";
+import {isDefined, isEqual, isObject, isString, isTruthy, Logger, ServerError} from "@typeix/utils";
 import {Inject, Injectable, Injector} from "@typeix/di";
 import {IResolvedRoute, Route, RouteRuleConfig, TRoute} from "./interfaces/iroute";
 import {RouteRule} from "./route-rule";
@@ -154,10 +154,10 @@ export class Router {
    */
   async parseRequest(pathName: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute> {
     for (let route of this.routes) {
-      let result = await route.parseRequest(pathName, method, headers);
-      if (isTruthy(result) && !isEqual(true, result)) {
+      let result: IResolvedRoute = <IResolvedRoute> await route.parseRequest(pathName, method, headers);
+      if (isTruthy(result) && isObject(result)) {
         this.logger.info("Router.parseRequest", result);
-        return Promise.resolve(<IResolvedRoute> result);
+        return result;
       }
     }
     throw new ServerError(

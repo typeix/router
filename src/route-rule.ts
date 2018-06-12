@@ -35,14 +35,13 @@ export class RouteRule implements Route, IAfterConstruct {
   afterConstruct(): void {
     this.routeParser = new RouteParser(this.config.url);
   }
-
   /**
    * @since 1.0.0
    * @function
    * @name RouteRule#parseRequest
    * @param {String} path
    * @param {String} method
-   * @param {Headers} headers
+   * @param {Object} headers
    * @private
    *
    * @return {Promise<IResolvedRoute>}
