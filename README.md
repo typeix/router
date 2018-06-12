@@ -2,17 +2,17 @@
 
 Missing router for node js
 
-##Required
+## Required
 - Node.js gte 6.x
 - Typescript gte 2.x
 
-Installing:
+## Installing:
 ```bash
 npm i @typeix/di @typeix/router @typeix/utils --save
 npm i @types/node --save-dev
 ```
 
-Example of usage:
+## Example of usage:
 ```typescript
 import {Injector} from "@typeix/di";
 import {Router, RestMethods, IResolvedRoute} from "@typeix/router";
