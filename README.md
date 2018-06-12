@@ -12,7 +12,7 @@ npm i @typeix/utils --save
 Example of usage:
 ```typescript
 import {Injector} from "@typeix/di";
-import {Router, RestMethods, IResolvedRoute, toRestMethod} from "@typeix/router";
+import {Router, RestMethods, IResolvedRoute} from "@typeix/router";
 import {Logger, isObject, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
 
@@ -108,6 +108,4 @@ async function requestHandler(request: IncomingMessage, response: ServerResponse
 let server = createServer();
 server.on("request", requestHandler);
 server.listen(4000);
-
-
 ```

@@ -4,4 +4,4 @@
 /jest-runner.json
 /tsconfig.json
 /tslint.json
-/examples
+/build/server.test.*

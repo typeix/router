@@ -1,3 +1,7 @@
+## 1.4.2
+- Export missing interfaces
+- Added more tests and example
+
 ## 1.4.1
 - remove unnecessary dependency
 

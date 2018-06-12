@@ -1,7 +1,7 @@
 import {Injector} from "@typeix/di";
 import {Logger, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
-import {RestMethods, Router, IResolvedRoute} from "./src";
+import {RestMethods, Router, IResolvedRoute} from "./index";
 
 // Injector
 let rootInjector = new Injector();
@@ -92,6 +92,6 @@ async function requestHandler(request: IncomingMessage, response: ServerResponse
   }
 }
 
-let server = createServer();
-server.on("request", requestHandler);
-server.listen(4000);
+let serverTest = createServer();
+serverTest.on("request", requestHandler);
+serverTest.listen(4000);
