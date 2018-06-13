@@ -1,4 +1,5 @@
 import {isEqual} from "@typeix/utils";
+
 /**
  * @since 1.0.0
  * @enum
@@ -20,6 +21,19 @@ export enum RestMethods {
   PATCH
 }
 
+/**
+ * Added rest methods helpers
+ */
+export namespace RestMethods {
+   export function* toIterator() {
+     for (let key of Object.keys(RestMethods)) {
+       yield RestMethods[key];
+     }
+  }
+  export function toArray() {
+    return Array.from(toIterator());
+  }
+}
 /**
  * @since 1.0.0
  * @function
@@ -50,6 +64,7 @@ export function fromRestMethod(method: RestMethods): string {
     return "PATCH";
   }
 }
+
 /**
  * @since 1.0.0
  * @function

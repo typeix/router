@@ -1,3 +1,7 @@
+## 1.4.3
+- Limit exports
+- Added iterator to rest methods
+
 ## 1.4.2
 - Export missing interfaces
 - Added more tests and example

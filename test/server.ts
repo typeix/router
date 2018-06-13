@@ -1,9 +1,9 @@
 import {Injector} from "@typeix/di";
-import {Logger, ServerError} from "@typeix/utils";
+import {Router, RestMethods, IResolvedRoute, fromRestMethod} from "@typeix/router";
+import {Logger, isObject, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
-import {RestMethods, Router, IResolvedRoute, fromRestMethod} from "./index";
 
-// Injector
+// Root injector used for dynamic routing
 let rootInjector = new Injector();
 let injector = Injector.createAndResolve(Router, [
   {provide: Injector, useValue: rootInjector},
@@ -24,7 +24,7 @@ router.addRules([
     url: "/"
   },
   {
-    methods: [RestMethods.GET, RestMethods.POST],
+    methods: [RestMethods.GET],
     route: "favicon",
     url: "/favicon.ico"
   },
@@ -54,7 +54,6 @@ function routeToString(route: IResolvedRoute) {
 const handlers = {
   handler1: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-
     response.end("handler 1: " + routeToString(route));
   },
   handler2: function (route: IResolvedRoute, response: ServerResponse) {
@@ -71,7 +70,7 @@ const handlers = {
   },
   favicon: function (route: IResolvedRoute, response: ServerResponse) {
     response.writeHead(200, {});
-    response.end("X");
+    response.end("favicon.ico");
   },
   error: function (error: ServerError, response: ServerResponse) {
     response.writeHead(error.getCode(), {});
@@ -95,6 +94,6 @@ async function requestHandler(request: IncomingMessage, response: ServerResponse
   }
 }
 
-let serverTest = createServer();
-serverTest.on("request", requestHandler);
-serverTest.listen(4000);
+let server = createServer();
+server.on("request", requestHandler);
+server.listen(4000);

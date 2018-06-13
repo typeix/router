@@ -5,3 +5,4 @@
 /tsconfig.json
 /tslint.json
 /build/server.test.*
+/test
