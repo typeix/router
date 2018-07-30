@@ -39,7 +39,6 @@ router.addRules([
     url: "/home/<id:(\\d+)>"
   }
 ]);
-
 /**
  * Nice route print
  * @param {IResolvedRoute} route
