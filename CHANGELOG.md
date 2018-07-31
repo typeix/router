@@ -1,3 +1,6 @@
+## 1.5.0
+- update to latest di
+
 ## 1.4.3
 - Limit exports
 - Added iterator to rest methods

@@ -1,6 +1,6 @@
 {
   "name": "@typeix/router",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "missing router for nodejs",
   "main": "build/index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "ts-jest": "^22.4.5"
   },
   "dependencies": {
-    "@typeix/di": "~1.4.1",
+    "@typeix/di": "~1.5.0",
     "@typeix/utils": "~1.4.1"
   }
 }
