@@ -1,5 +1,5 @@
 import {Injector} from "@typeix/di";
-import {Router, RestMethods, IResolvedRoute, fromRestMethod} from "@typeix/router";
+import {Router, RestMethods, IResolvedRoute, fromRestMethod} from "../";
 import {Logger, isObject, ServerError} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
 
