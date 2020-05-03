@@ -1,5 +1,7 @@
 import {IParserConfig} from "./interfaces/iparser";
-import {isArray, isDefined, isFalsy, isObject, isString, isUndefined, ServerError, StatusCodes} from "@typeix/utils";
+import {isArray, isDefined, isFalsy, isObject, isString, isUndefined} from "@typeix/utils";
+import {StatusCodes} from "./status-codes";
+import {ServerError} from "./server-error";
 
 const PATTERN_MATCH = /<((\w+):)?([^>]+)>/g;
 const HAS_GROUP_START = /^\(/;

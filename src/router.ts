@@ -1,8 +1,9 @@
-import {isDefined, isEqual, isObject, isString, isTruthy, Logger, ServerError} from "@typeix/utils";
+import {isDefined, isEqual, isObject, isString, isTruthy, Logger} from "@typeix/utils";
 import {Inject, Injectable, Injector} from "@typeix/di";
 import {IResolvedRoute, Route, RouteRuleConfig, TRoute} from "./interfaces/iroute";
 import {RouteRule} from "./route-rule";
-import {StatusCodes} from "@typeix/utils";
+import {ServerError} from "./server-error";
+import {StatusCodes} from "./status-codes";
 
 /**
  * @since 1.0.0

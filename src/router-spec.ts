@@ -1,8 +1,9 @@
 import {Router} from "./router";
 import {Injector} from "@typeix/di";
-import {Logger, ServerError} from "@typeix/utils";
-import {IResolvedRoute, Route} from "./interfaces/iroute";
+import {Logger} from "@typeix/utils";
+import {IResolvedRoute, Route} from "./interfaces";
 import {RestMethods} from "./headers";
+import {ServerError} from "./server-error";
 
 
 describe("Router", () => {
