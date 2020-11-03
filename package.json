@@ -5,7 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "compile": "tsc",
-    "test": "npm run compile && jest -c jest-runner.json"
+    "test": "npm run compile && jest -c jest-runner.json",
+    "server": "tsc test/server.ts && node test/server.js"
   },
   "repository": {
     "type": "git",

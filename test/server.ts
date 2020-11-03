@@ -3,11 +3,30 @@ import {Router, HttpMethod, IResolvedRoute, RouterError, toHttpMethod} from "../
 import {isObject} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
 import {Logger, configure, getLogger} from "log4js";
+import * as log4j from "log4js";
 // Root injector used for dynamic routing
+log4j.addLayout('json', function (config) {
+  return function (logEvent) {
+    return JSON.stringify(logEvent) + config.separator;
+  }
+});
 let rootInjector = new Injector();
 let injector = Injector.createAndResolve(Router, [
   {provide: Injector, useValue: rootInjector},
-  Logger
+  {
+    provide: "logger",
+    useFactory: () => {
+      return log4j.configure({
+        appenders: {
+          out: { type: 'stdout', layout: { type: 'json', separator: ',' } }
+        },
+        categories: {
+          default: { appenders: ['out'], level: 'info' }
+        }
+      }).getLogger();
+    },
+    providers: []
+  }
 ]);
 let router: Router = injector.get(Router);
 // adding rules
