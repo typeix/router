@@ -1,11 +1,11 @@
-import {RestMethods} from "./headers";
+import {HttpMethod} from "./methods";
 import {RouteRule} from "./route-rule";
 import {Injector} from "@typeix/di";
 
 describe("RouteRule", () => {
   it("Parse route and create url", () => {
     let config = {
-      methods: [RestMethods.GET, RestMethods.POST],
+      methods: [HttpMethod.GET, HttpMethod.POST],
       route: "core/index",
       url: "/home/<id:(\\d+)>"
     };
@@ -14,28 +14,28 @@ describe("RouteRule", () => {
     expect(route).not.toBeNull();
     return Promise
       .all([
-        route.parseRequest("/home/123", "GET", {}),
-        route.parseRequest("/home/123", "POST", {}),
-        route.parseRequest("/home/123", "CONNECT", {}),
+        route.parseRequest("/home/123", HttpMethod.GET, {}),
+        route.parseRequest("/home/123", HttpMethod.POST, {}),
+        route.parseRequest("/home/123", HttpMethod.CONNECT, {}),
         route.createUrl("core/index", {id: 123})
       ])
       .then(data => {
         let result = [
           {
-            method: RestMethods.GET,
+            method: HttpMethod.GET,
             params: {
               id: "123"
             },
             route: "core/index"
           },
           {
-            method: RestMethods.POST,
+            method: HttpMethod.POST,
             params: {
               id: "123"
             },
             route: "core/index"
           },
-          false,
+          null,
           "/home/123"
         ];
         expect(data).toEqual(result);

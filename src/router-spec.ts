@@ -1,10 +1,16 @@
 import {Router} from "./router";
 import {Injector} from "@typeix/di";
-import {Logger} from "@typeix/utils";
 import {IResolvedRoute, Route} from "./interfaces";
-import {RestMethods} from "./headers";
-import {ServerError} from "./server-error";
+import {HttpMethod, toHttpMethod} from "./methods";
+import {RouterError} from "./router-error";
+import * as log4j from "log4js";
 
+
+log4j.addLayout('json', function (config) {
+  return function (logEvent) {
+    return JSON.stringify(logEvent) + config.separator;
+  }
+});
 
 describe("Router", () => {
 
@@ -13,8 +19,24 @@ describe("Router", () => {
   beforeEach(() => {
     let rootInjector = new Injector();
     let injector = Injector.createAndResolve(Router, [
-      {provide: Injector, useValue: rootInjector},
-      {provide: Logger, useClass: Logger}
+      {
+        provide: Injector,
+        useValue: rootInjector
+      },
+      {
+        provide: "logger",
+        useFactory: () => {
+          return log4j.configure({
+            appenders: {
+              out: { type: 'stdout', layout: { type: 'json', separator: ',' } }
+            },
+            categories: {
+              default: { appenders: ['out'], level: 'info' }
+            }
+          }).getLogger();
+        },
+        providers: []
+      }
     ]);
     router = injector.get(Router);
   });
@@ -22,11 +44,11 @@ describe("Router", () => {
   test("Parse request and create dynamic url", () => {
 
     class DynamicRule implements Route {
-      parseRequest(pathName: string, method: string, headers: Headers): Promise<IResolvedRoute | boolean> {
-        return Promise.resolve(true);
+      parseRequest(pathName: string, method: string, headers: Headers): Promise<IResolvedRoute> {
+        return Promise.resolve(null);
       }
 
-      createUrl(routeName: string, params: Object): Promise<string | boolean> {
+      createUrl(routeName: string, params: Object): Promise<string> {
         return null;
       }
 
@@ -34,12 +56,12 @@ describe("Router", () => {
 
     router.addRule(DynamicRule);
 
-    return router.parseRequest("/", "GET", {}).then((data) => {
+    return router.parseRequest("/", HttpMethod.GET, {}).then((data) => {
       let result = [];
       expect(data).toEqual(result);
     })
-      .catch((error: ServerError) => {
-       expect(error.getMessage()).toBe("Router.parseRequest: / no route found, method: GET");
+      .catch((error: RouterError) => {
+        expect(error.getMessage()).toBe("Router.parseRequest: / no route found, method: GET");
       });
   });
 
@@ -49,32 +71,32 @@ describe("Router", () => {
 
     router.addRules([
       {
-        methods: [RestMethods.OPTIONS],
+        methods: [HttpMethod.OPTIONS],
         route: "controller/test",
         url: "*"
       },
       {
-        methods: [RestMethods.GET, RestMethods.POST],
+        methods: [HttpMethod.GET, HttpMethod.POST],
         route: "controller/index",
         url: "/"
       },
       {
-        methods: [RestMethods.GET, RestMethods.POST],
+        methods: [HttpMethod.GET, HttpMethod.POST],
         route: "controller/home",
         url: "/home"
       },
       {
-        methods: [RestMethods.GET],
+        methods: [HttpMethod.GET],
         route: "controller/view",
         url: "/home/<id:(\\d+)>"
       }
     ]);
 
     return Promise.all([
-      router.parseRequest("/", "POST", {}),
-      router.parseRequest("/authenticate", "OPTIONS", {}),
-      router.parseRequest("/home", "GET", {}),
-      router.parseRequest("/home/123", "GET", {}),
+      router.parseRequest("/", HttpMethod.POST, {}),
+      router.parseRequest("/authenticate", HttpMethod.OPTIONS, {}),
+      router.parseRequest("/home", HttpMethod.GET, {}),
+      router.parseRequest("/home/123", HttpMethod.GET, {}),
       router.createUrl("controller/view", {id: 123}),
       router.createUrl("controller/index", {}),
       router.createUrl("controller/home", {}),
@@ -82,22 +104,22 @@ describe("Router", () => {
     ]).then((data) => {
       let result = [
         {
-          method: RestMethods.POST,
+          method: HttpMethod.POST,
           params: {},
           route: "controller/index"
         },
         {
-          method: RestMethods.OPTIONS,
+          method: HttpMethod.OPTIONS,
           params: {},
           route: "controller/test"
         },
         {
-          method: RestMethods.GET,
+          method: HttpMethod.GET,
           params: {},
           route: "controller/home"
         },
         {
-          method: RestMethods.GET,
+          method: HttpMethod.GET,
           params: {
             id: "123"
           },
@@ -114,36 +136,47 @@ describe("Router", () => {
   });
 
 
-
   test("Testing handlers", () => {
 
 
     let rootInjector = new Injector();
     let injector = Injector.createAndResolve(Router, [
       {provide: Injector, useValue: rootInjector},
-      Logger
+      {
+        provide: "logger",
+        useFactory: () => {
+          return log4j.configure({
+            appenders: {
+              out: { type: 'stdout', layout: { type: 'json', separator: ',' } }
+            },
+            categories: {
+              default: { appenders: ['out'], level: 'info' }
+            }
+          }).getLogger();
+        }
+      }
     ]);
     let router1 = injector.get(Router);
 // adding rules
 
     router1.addRules([
       {
-        methods: [RestMethods.OPTIONS],
+        methods: [HttpMethod.OPTIONS],
         route: "handler1",
         url: "*"
       },
       {
-        methods: [RestMethods.GET, RestMethods.POST],
+        methods: [HttpMethod.GET, HttpMethod.POST],
         route: "handler2",
         url: "/"
       },
       {
-        methods: [RestMethods.GET, RestMethods.POST],
+        methods: [HttpMethod.GET, HttpMethod.POST],
         route: "handler3",
         url: "/home"
       },
       {
-        methods: [RestMethods.GET],
+        methods: [HttpMethod.GET],
         route: "handler4",
         url: "/home/<id:(\\d+)>"
       }
@@ -151,11 +184,11 @@ describe("Router", () => {
 
 
     return Promise.all([
-      router1.parseRequest("/", "POST", {}),
-      router1.parseRequest("/", "GET", {}),
-      router1.parseRequest("/authenticate", "OPTIONS", {}),
-      router1.parseRequest("/home", "GET", {}),
-      router1.parseRequest("/home/123", "GET", {}),
+      router1.parseRequest("/", HttpMethod.POST, {}),
+      router1.parseRequest("/", HttpMethod.GET, {}),
+      router1.parseRequest("/authenticate", HttpMethod.OPTIONS, {}),
+      router1.parseRequest("/home", HttpMethod.GET, {}),
+      router1.parseRequest("/home/123", HttpMethod.GET, {}),
       router1.createUrl("handler4", {id: 123}),
       router1.createUrl("handler3", {}),
       router1.createUrl("handler2", {}),
@@ -163,27 +196,27 @@ describe("Router", () => {
     ]).then((data) => {
       let result = [
         {
-          method: RestMethods.POST,
+          method: HttpMethod.POST,
           params: {},
           route: "handler2"
         },
         {
-          method: RestMethods.GET,
+          method: HttpMethod.GET,
           params: {},
           route: "handler2"
         },
         {
-          method: RestMethods.OPTIONS,
+          method: HttpMethod.OPTIONS,
           params: {},
           route: "handler1"
         },
         {
-          method: RestMethods.GET,
+          method: HttpMethod.GET,
           params: {},
           route: "handler3"
         },
         {
-          method: RestMethods.GET,
+          method: HttpMethod.GET,
           params: {
             id: "123"
           },
@@ -211,5 +244,9 @@ describe("Router", () => {
     expect("admin/error/index").toEqual(router.getError("admin"));
   });
 
+  test("HttpMethod", () => {
+    expect(toHttpMethod("GET")).toBe(HttpMethod.GET);
+    expect(toHttpMethod("POST")).toBe(HttpMethod.POST);
+  })
 
 });

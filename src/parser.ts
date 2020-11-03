@@ -1,7 +1,6 @@
 import {IParserConfig} from "./interfaces/iparser";
 import {isArray, isDefined, isFalsy, isObject, isString, isUndefined} from "@typeix/utils";
-import {StatusCodes} from "./status-codes";
-import {ServerError} from "./server-error";
+import {RouterError} from "./router-error";
 
 const PATTERN_MATCH = /<((\w+):)?([^>]+)>/g;
 const HAS_GROUP_START = /^\(/;
@@ -25,8 +24,8 @@ export class RouteParser {
   constructor(path: string, config?: IParserConfig) {
     let pattern, anyPattern = "([\\s\\S]+)";
     if (isFalsy(path) || ["/", "*"].indexOf(path.charAt(0)) === -1) {
-      throw new ServerError(
-        StatusCodes.Internal_Server_Error,
+      throw new RouterError(
+        500,
         "Url must start with \/ or it has to be * which match all patterns",
         {
           path,
@@ -69,7 +68,7 @@ export class RouteParser {
    * @param {Object} vars
    * @returns {string}
    */
-  public createUrl(vars: Object): string | boolean {
+  public createUrl(vars: Object): string {
     if (this.verifyVariableKeys(vars) && isString(this.reverseUrlPattern)) {
       let keys = Object.keys(vars);
       let url = this.reverseUrlPattern;
@@ -79,7 +78,7 @@ export class RouteParser {
       }
       return url;
     }
-    return false;
+    return null;
   }
 
   /**

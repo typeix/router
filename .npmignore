@@ -6,3 +6,4 @@
 /tslint.json
 /build/server.test.*
 /test
+*.js.map

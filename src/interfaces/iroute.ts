@@ -1,4 +1,4 @@
-import {RestMethods} from "../headers";
+import {HttpMethod} from "../methods";
 
 /**
  * @since 1.0.0
@@ -13,7 +13,7 @@ import {RestMethods} from "../headers";
  * Resolved route
  */
 export interface IResolvedRoute {
-  method: RestMethods;
+  method: HttpMethod;
   params: Object;
   route: string;
 }
@@ -27,9 +27,9 @@ export interface IResolvedRoute {
  * Route definition
  */
 export interface Route {
-  parseRequest(pathName: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute | boolean>;
+  parseRequest(pathName: string, method: HttpMethod, headers: { [key: string]: any }): Promise<IResolvedRoute>;
 
-  createUrl(routeName: string, params: Object): Promise<string | boolean>;
+  createUrl(routeName: string, params: Object): Promise<string>;
 }
 
 /**
@@ -55,6 +55,6 @@ export declare type TRoute = {
 export interface RouteRuleConfig {
   url: string;
   route: string;
-  methods: Array<RestMethods>;
+  methods: Array<HttpMethod>;
 }
 

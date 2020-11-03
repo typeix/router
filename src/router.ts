@@ -1,10 +1,10 @@
-import {isDefined, isEqual, isObject, isString, isTruthy, Logger} from "@typeix/utils";
+import {isDefined, isEqual, isObject, isString, isTruthy} from "@typeix/utils";
 import {Inject, Injectable, Injector} from "@typeix/di";
 import {IResolvedRoute, Route, RouteRuleConfig, TRoute} from "./interfaces/iroute";
 import {RouteRule} from "./route-rule";
-import {ServerError} from "./server-error";
-import {StatusCodes} from "./status-codes";
-
+import {RouterError} from "./router-error";
+import {HttpMethod} from "./methods";
+import {Logger} from "log4js";
 /**
  * @since 1.0.0
  * @class
@@ -21,13 +21,12 @@ export class Router {
   /**
    * @param {Injector} injector
    */
-  @Inject(Logger)
+  @Inject("logger")
   private logger: Logger;
   /**
    * @param {Injector} injector
    */
-  @Inject(Injector)
-  private injector: Injector;
+  @Inject() private injector: Injector;
   /**
    * @param {Array<Route>} routes
    */
@@ -79,7 +78,7 @@ export class Router {
   /**
    * @since 1.0.0
    * @function
-   * @name Router#hasErrorRoute
+   * @name Router#hasError
    *
    * @description
    * Check if error route is provided
@@ -101,8 +100,8 @@ export class Router {
     if (this.errorRoutes.indexOf(route) === -1 && isString(route)) {
       let list = route.split("/");
       if (list.length < 2) {
-        throw new ServerError(
-          StatusCodes.Internal_Server_Error,
+        throw new RouterError(
+          500,
           `Invalid route structure: "${route}"! Valid are controller/action or module/controller/action!`,
           route
         );
@@ -153,7 +152,7 @@ export class Router {
    * @description
    * Parse request based on pathName and method
    */
-  async parseRequest(pathName: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute> {
+  async parseRequest(pathName: string, method: HttpMethod, headers: { [key: string]: any }): Promise<IResolvedRoute> {
     for (let route of this.routes) {
       let result: IResolvedRoute = <IResolvedRoute> await route.parseRequest(pathName, method, headers);
       if (isTruthy(result) && isObject(result)) {
@@ -161,8 +160,8 @@ export class Router {
         return result;
       }
     }
-    throw new ServerError(
-      StatusCodes.Not_Found,
+    throw new RouterError(
+      404,
       `Router.parseRequest: ${pathName} no route found, method: ${method}`,
       {
         pathName,

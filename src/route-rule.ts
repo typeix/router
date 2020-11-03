@@ -1,8 +1,8 @@
 import {IAfterConstruct, Inject, Injectable} from "@typeix/di";
 import {RouteParser} from "./parser";
-import {IResolvedRoute, Route, RouteRuleConfig} from "./interfaces/iroute";
-import {toRestMethod} from "./headers";
+import {HttpMethod} from "./methods";
 import {isFalsy} from "@typeix/utils";
+import {IResolvedRoute, Route, RouteRuleConfig} from "./interfaces";
 
 
 /**
@@ -50,12 +50,12 @@ export class RouteRule implements Route, IAfterConstruct {
    * @description
    * Parse request is used internally by Router to be able to parse request
    */
-  parseRequest(path: string, method: string, headers: { [key: string]: any }): Promise<IResolvedRoute | boolean> {
-    if (!this.routeParser.isValid(path) || this.config.methods.indexOf(toRestMethod(method)) === -1) {
-      return Promise.resolve(false);
+  parseRequest(path: string, method: HttpMethod, headers: { [key: string]: any }): Promise<IResolvedRoute> {
+    if (!this.routeParser.isValid(path) || this.config.methods.indexOf(method) === -1) {
+      return Promise.resolve(null);
     }
     return Promise.resolve({
-      method: toRestMethod(method),
+      method: method,
       params: this.routeParser.getParams(path),
       route: this.config.route
     });
@@ -75,7 +75,7 @@ export class RouteRule implements Route, IAfterConstruct {
    * @description
    * It try's to create url
    */
-  createUrl(routeName: string, params: Object): Promise<string | boolean> {
+  createUrl(routeName: string, params: Object): Promise<string> {
     if (this.config.route === routeName) {
       let url = this.routeParser.createUrl(params);
       if (isFalsy(url)) {
@@ -83,6 +83,6 @@ export class RouteRule implements Route, IAfterConstruct {
       }
       return Promise.resolve(url);
     }
-    return Promise.resolve(false);
+    return Promise.resolve(null);
   }
 }

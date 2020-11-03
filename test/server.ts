@@ -1,8 +1,8 @@
 import {Injector} from "@typeix/di";
-import {Router, RestMethods, IResolvedRoute, fromRestMethod} from "../";
-import {Logger, isObject, ServerError} from "@typeix/utils";
+import {Router, HttpMethod, IResolvedRoute, RouterError, toHttpMethod} from "../";
+import {isObject} from "@typeix/utils";
 import {createServer, IncomingMessage, ServerResponse} from "http";
-
+import {Logger, configure, getLogger} from "log4js";
 // Root injector used for dynamic routing
 let rootInjector = new Injector();
 let injector = Injector.createAndResolve(Router, [
@@ -14,27 +14,27 @@ let router: Router = injector.get(Router);
 
 router.addRules([
   {
-    methods: [RestMethods.OPTIONS],
+    methods: [HttpMethod.OPTIONS],
     route: "handler1",
     url: "*"
   },
   {
-    methods: [RestMethods.GET, RestMethods.POST],
+    methods: [HttpMethod.GET, HttpMethod.POST],
     route: "handler2",
     url: "/"
   },
   {
-    methods: [RestMethods.GET],
+    methods: [HttpMethod.GET],
     route: "favicon",
     url: "/favicon.ico"
   },
   {
-    methods: [RestMethods.GET, RestMethods.POST],
+    methods: [HttpMethod.GET, HttpMethod.POST],
     route: "handler3",
     url: "/home"
   },
   {
-    methods: [RestMethods.GET],
+    methods: [HttpMethod.GET],
     route: "handler4",
     url: "/home/<id:(\\d+)>"
   }
@@ -45,7 +45,7 @@ router.addRules([
  * @returns {string}
  */
 function routeToString(route: IResolvedRoute) {
-  return JSON.stringify(Object.assign(route, {method: fromRestMethod(route.method)}));
+  return JSON.stringify(Object.assign(route, {method: route.method}));
 }
 /**
  * Route handlers can be any function / object
@@ -71,7 +71,7 @@ const handlers = {
     response.writeHead(200, {});
     response.end("favicon.ico");
   },
-  error: function (error: ServerError, response: ServerResponse) {
+  error: function (error: RouterError, response: ServerResponse) {
     response.writeHead(error.getCode(), {});
     response.end("error: " + JSON.stringify(error));
   }
@@ -86,7 +86,7 @@ const handlers = {
  */
 async function requestHandler(request: IncomingMessage, response: ServerResponse) {
   try {
-    let route: IResolvedRoute = await router.parseRequest(request.url, request.method, request.headers);
+    let route: IResolvedRoute = await router.parseRequest(request.url, toHttpMethod(request.method), request.headers);
     handlers[route.route].call({}, route, response);
   } catch (e) {
     handlers.error.call({}, e, response);
