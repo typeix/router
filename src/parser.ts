@@ -1,5 +1,5 @@
-import {IParserConfig} from "./interfaces/iparser";
 import {isArray, isDefined, isFalsy, isObject, isString, isUndefined} from "@typeix/utils";
+import {IParserConfig} from "./interfaces/iparser";
 import {RouterError} from "./router-error";
 
 const PATTERN_MATCH = /<((\w+):)?([^>]+)>/g;

@@ -1,10 +1,10 @@
 import {isDefined, isEqual, isObject, isString, isTruthy} from "@typeix/utils";
 import {Inject, Injectable, Injector} from "@typeix/di";
+import {Logger} from "@typeix/logger";
 import {IResolvedRoute, Route, RouteRuleConfig, TRoute} from "./interfaces/iroute";
 import {RouteRule} from "./route-rule";
 import {RouterError} from "./router-error";
 import {HttpMethod} from "./methods";
-import {Logger} from "log4js";
 /**
  * @since 1.0.0
  * @class
@@ -21,8 +21,7 @@ export class Router {
   /**
    * @param {Injector} injector
    */
-  @Inject("logger")
-  private logger: Logger;
+  @Inject() private logger: Logger;
   /**
    * @param {Injector} injector
    */

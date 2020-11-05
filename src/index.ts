@@ -4,4 +4,3 @@ export {RouteRule} from "./route-rule";
 export {HttpMethod, toHttpMethod} from "./methods";
 export {IResolvedRoute, Route, RouteRuleConfig} from "./interfaces";
 export {RouterError} from "./router-error";
-export * as log4js from "log4js";

@@ -3,14 +3,7 @@ import {Injector} from "@typeix/di";
 import {IResolvedRoute, Route} from "./interfaces";
 import {HttpMethod, toHttpMethod} from "./methods";
 import {RouterError} from "./router-error";
-import * as log4j from "log4js";
-
-
-log4j.addLayout('json', function (config) {
-  return function (logEvent) {
-    return JSON.stringify(logEvent) + config.separator;
-  }
-});
+import {Logger} from "@typeix/logger";
 
 describe("Router", () => {
 
@@ -23,20 +16,7 @@ describe("Router", () => {
         provide: Injector,
         useValue: rootInjector
       },
-      {
-        provide: "logger",
-        useFactory: () => {
-          return log4j.configure({
-            appenders: {
-              out: { type: 'stdout', layout: { type: 'json', separator: ',' } }
-            },
-            categories: {
-              default: { appenders: ['out'], level: 'info' }
-            }
-          }).getLogger();
-        },
-        providers: []
-      }
+      Logger
     ]);
     router = injector.get(Router);
   });
@@ -142,19 +122,7 @@ describe("Router", () => {
     let rootInjector = new Injector();
     let injector = Injector.createAndResolve(Router, [
       {provide: Injector, useValue: rootInjector},
-      {
-        provide: "logger",
-        useFactory: () => {
-          return log4j.configure({
-            appenders: {
-              out: { type: 'stdout', layout: { type: 'json', separator: ',' } }
-            },
-            categories: {
-              default: { appenders: ['out'], level: 'info' }
-            }
-          }).getLogger();
-        }
-      }
+      Logger
     ]);
     let router1 = injector.get(Router);
 // adding rules
