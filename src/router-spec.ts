@@ -217,4 +217,60 @@ describe("Router", () => {
     expect(toHttpMethod("POST")).toBe(HttpMethod.POST);
   })
 
+
+  test("Testing dynamic", () => {
+
+
+    let rootInjector = new Injector();
+    let injector = Injector.createAndResolve(Router, [
+      {provide: Injector, useValue: rootInjector},
+      Logger
+    ]);
+    let router1 = injector.get(Router);
+// adding rules
+
+    router1.addRules([
+      {
+        methods: [HttpMethod.GET],
+        route: "<module>/<controller>/<action>",
+        url: "/<module>/<controller>/<action>"
+      },
+      {
+        methods: [HttpMethod.GET],
+        route: "<controller>/<action>",
+        url: "/<controller>/<action>"
+      }
+    ]);
+
+
+    return Promise.all([
+      router1.parseRequest("/account/create", HttpMethod.GET, {}),
+      router1.parseRequest("/admin/account/create", HttpMethod.GET, {}),
+      router1.createUrl("<controller>/<action>", {controller: "account", action: "create"}),
+      router1.createUrl("<module>/<controller>/<action>", {
+        module: "admin",
+        controller: "account",
+        action: "create"
+      }),
+    ]).then((data) => {
+      let result = [
+        {
+          method: HttpMethod.GET,
+          params: {controller: "account", action: "create"},
+          route: "account/create"
+        },
+        {
+          method: HttpMethod.GET,
+          params: {module: "admin", controller: "account", action: "create"},
+          route: "admin/account/create"
+        },
+        "/account/create",
+        "/admin/account/create"
+      ];
+
+      expect(data).toEqual(result);
+    });
+
+  });
+
 });

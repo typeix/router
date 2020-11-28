@@ -32,7 +32,7 @@ export class RouteParser {
           config
         }
       );
-    } else if (PATTERN_MATCH.test(path)) {
+    } else if (this.hasVariables(path)) {
       let vIndex = 0;
       pattern = path.replace(PATTERN_MATCH, (replace, key, source, index) => {
         let rPattern = index;
@@ -64,19 +64,34 @@ export class RouteParser {
   }
 
   /**
+   * Check if pattern has variables
+   * @param path
+   */
+  public hasVariables(path: string): boolean {
+    return PATTERN_MATCH.test(path);
+  }
+  /**
+   * Replace variables in path
+   * @param vars
+   * @param path
+   */
+  public replaceVariables(vars: Object, path: string): string {
+    let keys = Object.keys(vars);
+    let url = path;
+    while (keys.length > 0) {
+      let key = keys.pop();
+      url = url.replace("<" + key + ">", vars[key]);
+    }
+    return url;
+  }
+  /**
    * Create url vars
    * @param {Object} vars
    * @returns {string}
    */
   public createUrl(vars: Object): string {
     if (this.verifyVariableKeys(vars) && isString(this.reverseUrlPattern)) {
-      let keys = Object.keys(vars);
-      let url = this.reverseUrlPattern;
-      while (keys.length > 0) {
-        let key = keys.pop();
-        url = url.replace("<" + key + ">", vars[key]);
-      }
-      return url;
+      return this.replaceVariables(vars, this.reverseUrlPattern);
     }
     return null;
   }

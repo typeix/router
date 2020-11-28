@@ -54,10 +54,15 @@ export class RouteRule implements Route, IAfterConstruct {
     if (!this.routeParser.isValid(path) || this.config.methods.indexOf(method) === -1) {
       return Promise.resolve(null);
     }
+    let route = this.config.route;
+    let params = this.routeParser.getParams(path);
+    if (this.routeParser.hasVariables(this.config.route)) {
+      route = this.routeParser.replaceVariables(params, this.config.route);
+    }
     return Promise.resolve({
       method: method,
-      params: this.routeParser.getParams(path),
-      route: this.config.route
+      params: params,
+      route: route
     });
   }
 

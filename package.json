@@ -1,6 +1,6 @@
 {
   "name": "@typeix/router",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "missing router for nodejs",
   "main": "build/index.js",
   "scripts": {
